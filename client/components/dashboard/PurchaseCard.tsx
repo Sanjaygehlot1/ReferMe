@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { buyProduct } from "@/controllers/user";
+import { getAuth } from "@/context/authContext";
 
 
 export default function PurchaseCard({ onSuccess }: { onSuccess?: () => void }) {
@@ -9,22 +11,19 @@ export default function PurchaseCard({ onSuccess }: { onSuccess?: () => void }) 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
 
+  const {getUserSession} = getAuth()
+
   async function buy() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch(`/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ amount: Number(amount) || 0}),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Purchase failed");
-      setMessage(data?.credited ? "Purchase successful — credits awarded" : "Purchase successful");
+      const data = await buyProduct();
+      setMessage(data?.creditsEarned > 0 ? `Purchase successful — ${data.creditsEarned} credits awarded` : "Purchase successful");
       onSuccess?.();
-    } catch (e: any) {
-      setMessage(e.message);
+    
+
+    } catch (error: any) {
+      setMessage(error.message);
     } finally {
       setLoading(false);
     }

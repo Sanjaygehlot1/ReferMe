@@ -6,7 +6,7 @@ import { AnimatePresence } from "framer-motion";
 export default function ReferralLinkCard({ referralCode }: { referralCode: string }) {
   const [copied, setCopied] = useState(false);
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : "");
-  const link = useMemo(() => `${baseUrl}/register?r=${referralCode || ""}`, [baseUrl, referralCode]);
+  const link = useMemo(() => `${baseUrl}/signup?ref=${referralCode || ""}`, [baseUrl, referralCode]);
 
   async function copy() {
     try {

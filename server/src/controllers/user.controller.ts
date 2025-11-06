@@ -8,6 +8,7 @@ import { envConfig } from "../../config/env.ts";
 import { referModel } from "../models/refer.model.ts";
 import { generateReferralCode } from "../utils/referCodeGenerator.ts";
 import { GenerateRefreshAndAccessToken } from "../utils/generateTokens.ts";
+import mongoose from "mongoose";
 
 
 export const signUpUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -41,6 +42,8 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
             throw new ApiError(401, "Error registering user!")
         }
 
+        console.log(referCode, email, name)
+
 
         if (referCode) {
             const referal_sender = await userModel.findOne({ referCode })
@@ -50,14 +53,39 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
                 throw new ApiError(409, "Invalid referal code")
             }
 
+            if (referal_sender._id.equals(user._id)) {
+                await userModel.deleteOne({ _id: user._id })
+                throw new ApiError(409, "You cannot use your own referral code");
+            }
+
+            const existing = await referModel.findOne({ referal_receiver: user._id })
+
+            console.log("Existing", existing)
+
+            if (existing) {
+                await userModel.deleteOne({ _id: user._id })
+                throw new ApiError(409, "This user has already been referred");
+            }
+
             const refer = await referModel.create({
                 referal_sender: referal_sender._id,
                 referal_receiver: user._id
             })
 
+            console.log("Refer", refer)
+
             if (!refer) {
                 throw new ApiError(401, "Error refering user!")
             }
+
+            const newUser = await userModel.findByIdAndUpdate(referal_sender._id,
+                {
+                    $inc: { referCount: 1 },
+                    $push: { referredUsers: user._id }
+                },
+                { new: true }
+            )
+            console.log(newUser)
         }
         res
             .status(201)
@@ -124,7 +152,71 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
             throw new ApiError(401, "Unauthorized Access!")
         }
 
-        const existingUser = await userModel.findOne({ _id: user.id }).select('-password -refreshToken')
+        const existingUser = await userModel.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(user.id) } },
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "referredUsers",
+                    foreignField: "_id",
+                    as: "referred"
+                }
+            },
+
+            {
+                $lookup: {
+                    from: "refers",
+                    localField: "referredUsers",
+                    foreignField: "referal_receiver",
+                    as: "referralData"
+                }
+            },
+
+            {
+                $project: {
+                    name: 1,
+                    email: 1,
+                    referCode: 1,
+                    referCount: 1,
+                    converted: 1,
+                    credits: 1,
+                    referred: {
+                        $map: {
+                            input: "$referred",
+                            as: "u",
+                            in: {
+                                _id: "$$u._id",
+                                name: "$$u.name",
+                                email: "$$u.email",
+                                credits: "$$u.credits",
+                                createdAt: "$$u.createdAt",
+                                status: {
+                                    $cond: [
+                                        {
+                                            $in: [
+                                                "$$u._id",
+                                                {
+                                                    $map: {
+                                                        input: "$referralData",
+                                                        as: "r",
+                                                        in: {
+                                                            $cond: ["$$r.claimed", "$$r.referal_receiver", null]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        true, false
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+        )
 
         if (!existingUser) {
             throw new ApiError(401, "No user exists")
@@ -133,6 +225,72 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
         console.log(existingUser)
 
         res.status(200).json(new ApiResponse(200, "user profile fetched", existingUser))
+
+    } catch (error) {
+        console.log(error)
+        next(error)
+    }
+}
+
+export const logOutUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user
+
+        if (!user) {
+            throw new ApiError(401, "Unauthorized Access!")
+        }
+
+        res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json(new ApiResponse(200, "Logout Successful", {}))
+    } catch (error) {
+        console.log(error)
+        next(error)
+    }
+}
+
+export const buyProductSimulation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user;
+
+        if (!user) {
+            throw new ApiError(401, "Error: Unauthorized Access")
+        }
+
+        const exisitigReferral = await referModel.findOne({ referal_receiver: user.id })
+
+        if (!exisitigReferral) {
+            throw new ApiError(409, "referal not found")
+        }
+
+        let creditsEarned = 0
+
+        if (!exisitigReferral.claimed) {
+            exisitigReferral.claimed = true
+            exisitigReferral.save()
+
+            const sender = await userModel.findByIdAndUpdate(exisitigReferral.referal_sender, {
+                $inc: { credits: 2, converted : 1 },
+                
+            })
+
+            if (!sender) {
+                throw new ApiError(409, "Failed to reward credits to sender!")
+            }
+
+            creditsEarned = + 2
+
+            const receiver = await userModel.findByIdAndUpdate(user.id, {
+                $inc: { credits: 2 }
+            })
+
+            if (!receiver) {
+                throw new ApiError(409, "Failed to reward credits to receiver!")
+            }
+
+        }
+
+        res.status(200).json(new ApiResponse(200, "Product bought successfully", { creditsEarned }))
+
+
 
     } catch (error) {
         console.log(error)

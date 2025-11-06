@@ -3,12 +3,12 @@
 import { motion } from "framer-motion";
 
 export type ReferredRow = {
-  id: string;
+  _id: string;
   name?: string;
   email: string;
-  status: "pending" | "converted";
-  joinedAt?: string;
-};
+  status: boolean;
+  createdAt?: string;
+} ;
 
 export default function ReferredTable({ rows, loading }: { rows: ReferredRow[]; loading: boolean }) {
   return (
@@ -38,18 +38,18 @@ export default function ReferredTable({ rows, loading }: { rows: ReferredRow[]; 
               </tr>
             ) : rows?.length ? (
               rows.map((r) => (
-                <tr key={r.id} className="border-b last:border-b-0">
+                <tr key={r._id} className="border-b last:border-b-0">
                   <td className="py-3 pr-3 text-zinc-900">{r.name || "—"}</td>
                   <td className="px-3 py-3 text-zinc-700">{r.email}</td>
                   <td className="px-3 py-3">
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${
-                      r.status === "converted" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"
+                      r.status ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"
                     }`}>
-                      <span className={`h-2 w-2 rounded-full ${r.status === "converted" ? "bg-emerald-500" : "bg-amber-500"}`} />
-                      {r.status}
+                      <span className={`h-2 w-2 rounded-full ${r.status ? "bg-emerald-500" : "bg-amber-500"}`} />
+                      {r.status ? "Converted" : "Pending"}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-zinc-600">{r.joinedAt ? new Date(r.joinedAt).toLocaleDateString() : "—"}</td>
+                  <td className="px-3 py-3 text-zinc-600">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "—"}</td>
                 </tr>
               ))
             ) : (

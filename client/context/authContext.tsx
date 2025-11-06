@@ -4,10 +4,32 @@ import { useState } from "react";
 import { type ReactNode } from "react";
 import { axiosInstance } from "../helper/axiosInstace";
 
+type Referred = {
+  _id: string;
+  name: string;
+  email: string;
+  credits: number;
+  createdAt: string;
+  status: boolean;
+};
+
+export type User = {
+  _id: string;
+  email: string;
+  name: string;
+  referCount: number;
+  referCode: string;
+  credits: number;
+  converted: number;
+  referred: Referred[];
+};
+
 type AuthContextType = {
-    user: any;
-    Loading: boolean,
-    logOut: () => {}
+  user: User | null;
+  Loading: boolean;
+  logOut: () => Promise<void>;
+  getUserSession : () => Promise<void>
+
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -18,14 +40,18 @@ type AuthProviderProps = {
 
 export function AuthProvider({ children }: AuthProviderProps) {
 
-    const [user, setuser] = useState(null);
+    const [user, setuser] = useState<User | null>(null);
     const [Loading, setLoading] = useState(true);
 
     const getUserSession = async () => {
         try {
             const response = await axiosInstance.get('/users/profile')
             console.log(response.data)
-            setuser(response.data.data);
+
+            if(response.data.data){
+                setuser(response.data.data[0]);
+
+            }
             console.log(user)
 
         } catch (error) {
@@ -52,10 +78,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     }, [])
 
-    const values = {
+    const values  : AuthContextType= {
         user,
         Loading,
-        logOut
+        logOut,
+        getUserSession
     }
 
 

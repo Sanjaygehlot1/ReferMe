@@ -19,7 +19,7 @@ export const AuthMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     } catch (error: any) {
         console.log(error)
-        next(new ApiError(500, "Internal Server Error during authentication"));
+        next(error);
     }
 
 }

@@ -22,7 +22,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const params = useSearchParams();
 
-  const referralCode = useMemo(() => params.get("r") || "", [params]);
+  const referralCode = useMemo(() => params.get("ref") || "", [params]);
 
   const {
     register,
@@ -46,9 +46,13 @@ export default function SignUpPage() {
     if (referralCode) setValue("referCode", referralCode);
   }, [referralCode, setValue]);
 
+   const router = useRouter();
+
   const onSubmit = async (data: userData) => {
     try {
+      console.log(data)
       await signUp(data);
+      router.replace("/login");
     } catch (err: any) {
       setError("root", { type: "server", message: err?.message || "Something went wrong" });
     }

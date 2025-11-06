@@ -1,29 +1,45 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from 'bcrypt'
 import jwt, { type SignOptions } from 'jsonwebtoken'
+import { lowercase } from "zod";
 
 const userSchema = new Schema({
     name: {
         type: String,
-        req: true
+        required: true,
+        trim : true
     },
     email: {
         type: String,
-        req: true,
-        unique: true
+        required: true,
+        unique: true,
+        trim : true,
+        lowercase : true
     },
     password: {
         type: String,
-        req: true
+        required: true
     },
     refreshToken: {
         type: String,
-        req: true,
         select: false
     },
     referCode: {
         type: String
-    }
+    },
+    referCount: {
+        type: Number,
+        default: 0,
+    },
+    converted: {
+        type: Number,
+        default: 0
+    },
+    credits: {
+        type: Number,
+        default: 0
+    },
+    referredUsers: [{ type: Schema.Types.ObjectId, ref: "User" }]
 }, { timestamps: true })
 
 userSchema.pre("save", async function (this: any, next) {
@@ -33,20 +49,20 @@ userSchema.pre("save", async function (this: any, next) {
     next();
 });
 
-userSchema.methods.generateAccessToken =  function (this : any) {
+userSchema.methods.generateAccessToken = function (this: any) {
 
     const expiresIn = (process.env.ACCESSTOKEN_EXPIRY as SignOptions["expiresIn"]) || "15m";
 
     return jwt.sign({
         id: this._id,
         email: this.email,
-        name: this.fullname,
+        name: this.name,
     },
         process.env.ACCESSTOKEN_SECRET as string,
         { expiresIn }
     ) as string
 }
-userSchema.methods.generateRefreshToken =  function (this: any) {
+userSchema.methods.generateRefreshToken = function (this: any) {
 
     const expiresIn = (process.env.REFRESHTOKEN_EXPIRY as SignOptions["expiresIn"]) || "2d";
 
