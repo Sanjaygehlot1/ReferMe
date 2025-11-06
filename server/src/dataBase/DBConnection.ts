@@ -5,8 +5,8 @@ import { envConfig } from '../../config/env.ts';
 
 export const connectDB = async () =>{
     try {
-        console.log("Connecting to MongoDB", envConfig.MONGO_URI)
-        const connection = await mongoose.connect(envConfig.MONGO_URI!)
+        console.log("Connecting to MongoDB",process.env.MONGO_URI)
+        const connection = await mongoose.connect(process.env.MONGO_URI as string)
         if(connection.connections[0]!.readyState === 1){
             console.log("Connected to MongoDB")
             app.listen(envConfig.PORT || 8000, ()=>{

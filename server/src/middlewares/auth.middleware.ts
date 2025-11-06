@@ -1,21 +1,18 @@
 import type { Request, Response, NextFunction } from "express"
 import { ApiError } from "../utils/ApiError.ts"
 import jwt from 'jsonwebtoken'
-import { envConfig } from "../../config/env.ts"
+import type { JWTPayload } from "../../types/express.js"
 
-interface userReq extends Request {
-    user: any
-}
 
-export const AuthMiddleware = (req: userReq, res: Response, next: NextFunction) => {
+export const AuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = req.cookies?.token
+        const token = req.cookies?.accessToken
 
         if (!token) {
             throw new ApiError(401, "Unauthorized Access")
         }
 
-        const user = jwt.verify(token, envConfig.JWT_SECRET!)
+        const user = jwt.verify(token, process.env.ACCESSTOKEN_SECRET as string) as JWTPayload
 
         req.user = user
         next()

@@ -5,3 +5,4 @@ export const envConfig = {
     JWT_EXPIRY : process.env.JWT_EXPIRY
 
 }
+
