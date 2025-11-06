@@ -5,7 +5,7 @@ const PROTECTED = ["/dashboard"];
 const AUTH_PAGES = ["/login", "/signup"];
 const COOKIE_NAME = "accessToken";    
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get(COOKIE_NAME)?.value;
 

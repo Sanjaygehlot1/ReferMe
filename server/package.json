@@ -19,6 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "node": "^25.1.0",
+    "qrcode": "^1.5.4",
+    "uninstall": "^0.0.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

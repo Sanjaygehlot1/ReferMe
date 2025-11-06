@@ -49,6 +49,9 @@ export default function DashboardPage() {
               <p className="text-sm text-zinc-500">
                 Track referrals, conversions, and credits. Simulate purchases to test flows.
               </p>
+              {user.invitedBy && <p className="text-sm text-zinc-500">
+                 You are invited by <span className="font-bold text-black">{user.invitedBy}</span>
+              </p>}
             </div>
 
             <div className="flex items-center gap-3">

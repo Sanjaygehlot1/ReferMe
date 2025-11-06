@@ -187,6 +187,7 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
                     referCount: 1,
                     converted: 1,
                     credits: 1,
+                    invitedBy : 1,
                     referred: {
                         $map: {
                             input: "$referred",

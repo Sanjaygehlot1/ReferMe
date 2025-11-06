@@ -18,6 +18,7 @@ export type User = {
   _id: string;
   email: string;
   name: string;
+  invitedBy : string,
   referCount: number;
   referCode: string;
   credits: number;
