@@ -26,5 +26,11 @@ export const signUpSchema = z.object({
     .regex(/[0-9]/, "Password should contain at least one number")
     .regex(/[^A-Za-z0-9]/, "Password should contain at least one special character"),
 
-    referCode : z.string().length(8, "Code must be 8 characters long.").optional()
+   referCode: z
+  .string()
+  .length(8, "Referral code must be exactly 8 characters long.")
+  .or(z.literal("")) 
+  .optional()
+
+
 })

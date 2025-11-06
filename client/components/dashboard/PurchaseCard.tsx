@@ -20,7 +20,7 @@ export default function PurchaseCard({ onSuccess }: { onSuccess?: () => void }) 
       const data = await buyProduct();
       setMessage(data?.creditsEarned > 0 ? `Purchase successful — ${data.creditsEarned} credits awarded` : "Purchase successful");
       onSuccess?.();
-    
+      getUserSession()
 
     } catch (error: any) {
       setMessage(error.message);
@@ -54,7 +54,7 @@ export default function PurchaseCard({ onSuccess }: { onSuccess?: () => void }) 
         </button>
       </div>
       {message ? (
-        <div className="mt-2 text-xs text-zinc-600">{message}</div>
+        <div className="mt-2 text-xs text-green-500">{message}</div>
       ) : null}
     </motion.div>
   );

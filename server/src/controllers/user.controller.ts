@@ -35,7 +35,8 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
             name,
             email,
             password,
-            referCode: userReferCode
+            referCode: userReferCode,
+
         })
 
         if (!user) {
@@ -77,6 +78,10 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
             if (!refer) {
                 throw new ApiError(401, "Error refering user!")
             }
+
+            user.isInvited = true;
+            user.invitedBy = referal_sender.name
+            await user.save();
 
             const newUser = await userModel.findByIdAndUpdate(referal_sender._id,
                 {
@@ -129,7 +134,8 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const cookieOptions: CookieOptions = {
             httpOnly: true,
             sameSite: "lax",
-            secure: false
+            secure: false,
+            path: '/'
         }
 
 
@@ -240,7 +246,7 @@ export const logOutUser = async (req: Request, res: Response, next: NextFunction
             throw new ApiError(401, "Unauthorized Access!")
         }
 
-        res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json(new ApiResponse(200, "Logout Successful", {}))
+        res.status(200).clearCookie('accessToken', { path: '/' }).clearCookie('refreshToken', { path: '/' }).json(new ApiResponse(200, "Logout Successful", {}))
     } catch (error) {
         console.log(error)
         next(error)
@@ -255,37 +261,46 @@ export const buyProductSimulation = async (req: Request, res: Response, next: Ne
             throw new ApiError(401, "Error: Unauthorized Access")
         }
 
-        const exisitigReferral = await referModel.findOne({ referal_receiver: user.id })
+        const currentUser = await userModel.findById(user.id)
 
-        if (!exisitigReferral) {
-            throw new ApiError(409, "referal not found")
+        if (!currentUser) {
+            throw new ApiError(401, "user not found")
         }
-
         let creditsEarned = 0
 
-        if (!exisitigReferral.claimed) {
-            exisitigReferral.claimed = true
-            exisitigReferral.save()
+        if (currentUser.isInvited) {
+            const exisitigReferral = await referModel.findOne({ referal_receiver: user.id })
 
-            const sender = await userModel.findByIdAndUpdate(exisitigReferral.referal_sender, {
-                $inc: { credits: 2, converted : 1 },
-                
-            })
-
-            if (!sender) {
-                throw new ApiError(409, "Failed to reward credits to sender!")
+            if (!exisitigReferral) {
+                throw new ApiError(409, "referal not found")
             }
 
-            creditsEarned = + 2
 
-            const receiver = await userModel.findByIdAndUpdate(user.id, {
-                $inc: { credits: 2 }
-            })
 
-            if (!receiver) {
-                throw new ApiError(409, "Failed to reward credits to receiver!")
+            if (!exisitigReferral.claimed) {
+                exisitigReferral.claimed = true
+                exisitigReferral.save()
+
+                const sender = await userModel.findByIdAndUpdate(exisitigReferral.referal_sender, {
+                    $inc: { credits: 2, converted: 1 },
+
+                })
+
+                if (!sender) {
+                    throw new ApiError(409, "Failed to reward credits to sender!")
+                }
+
+                creditsEarned = + 2
+
+                const receiver = await userModel.findByIdAndUpdate(user.id, {
+                    $inc: { credits: 2 }
+                })
+
+                if (!receiver) {
+                    throw new ApiError(409, "Failed to reward credits to receiver!")
+                }
+
             }
-
         }
 
         res.status(200).json(new ApiResponse(200, "Product bought successfully", { creditsEarned }))

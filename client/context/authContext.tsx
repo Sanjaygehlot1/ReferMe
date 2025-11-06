@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect } from "react";
 import { useState } from "react";
 import { type ReactNode } from "react";
 import { axiosInstance } from "../helper/axiosInstace";
+import { useRouter } from "next/navigation";
 
 type Referred = {
   _id: string;
@@ -40,6 +41,8 @@ type AuthProviderProps = {
 
 export function AuthProvider({ children }: AuthProviderProps) {
 
+    const router = useRouter()
+
     const [user, setuser] = useState<User | null>(null);
     const [Loading, setLoading] = useState(true);
 
@@ -67,6 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
             await axiosInstance.get('/users/logout');
             setuser(null);
+             router.replace("/login");
         } catch (error) {
             console.log(error);
         }

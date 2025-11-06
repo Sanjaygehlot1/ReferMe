@@ -1,5 +1,6 @@
 "use client";
-
+import { useState } from "react";
+import { RxEyeClosed, RxEyeOpen } from "react-icons/rx";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validationSchemas/auth";
@@ -16,6 +17,8 @@ export type LoginData = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const {
     register,
@@ -30,7 +33,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginData) => {
     try {
-      
+
       await logIn(data)
 
       router.replace("/dashboard");
@@ -70,13 +73,24 @@ export default function LoginPage() {
           {...register("email")}
         />
 
-        <Input
-          type="password"
-          label="Password"
-          placeholder="••••••••"
-          error={errors.password?.message}
-          {...register("password")}
-        />
+        <div className="relative">
+          <Input
+            type={showPassword ? "text" : "password"}
+            label="Password"
+            placeholder="Choose a strong password"
+            error={errors.password?.message}
+            className="pr-10"
+            {...register("password")}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((p) => !p)}
+            className="absolute top-11 right-4 -translate-y-1/2 cursor-pointer text-zinc-500 hover:text-zinc-700"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <RxEyeClosed className="h-5 w-5" /> : <RxEyeOpen className="h-5 w-5" />}
+          </button>
+        </div>
 
         <SubmitButton loading={isSubmitting}>Sign in</SubmitButton>
       </form>
