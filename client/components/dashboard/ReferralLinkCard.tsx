@@ -21,7 +21,6 @@ export default function ReferralLinkCard({ referralCode }: { referralCode: strin
       const QR = await import("qrcode");
       const url = await QR.toDataURL(link, { width: 256, margin: 1 });
       if (mounted) setQrDataUrl(url);
-
     })();
     return () => {
       mounted = false;
@@ -55,20 +54,19 @@ export default function ReferralLinkCard({ referralCode }: { referralCode: strin
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
-    
       className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm "
     >
       <div className="mb-3 text-sm text-zinc-500 ">Your referral link</div>
 
-      <div className="flex items-start gap-3">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start">
         
-        <code className="scrollbar-hide grow overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-700 d">
+        <code className="scrollbar-hide grow overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-700">
           {link}
         </code>
 
-        <div className="flex items-stretch gap-2">
-
-          <div className="flex w-32 flex-col gap-2">
+        <div className="flex gap-2">
+          
+          <div className="flex flex-1 flex-col gap-2 md:w-32 md:flex-none">
             
             <button
               onClick={copy}
@@ -86,10 +84,9 @@ export default function ReferralLinkCard({ referralCode }: { referralCode: strin
             </button>
           </div>
 
-
           <button
             onClick={() => setShowQRBig(true)}
-            className="group relative flex h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm "
+            className="group relative flex h-[88px] w-[88px] flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm"
             title="Show QR"
           >
             {qrDataUrl ? (
@@ -99,7 +96,6 @@ export default function ReferralLinkCard({ referralCode }: { referralCode: strin
                 className="h-full w-full object-contain p-2 transition group-hover:scale-[1.02]"
               />
             ) : (
-
               <LuQrCode className="text-2xl text-zinc-500 " />
             )}
           </button>
@@ -126,7 +122,6 @@ export default function ReferralLinkCard({ referralCode }: { referralCode: strin
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-           
             className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"
           >
             <motion.div

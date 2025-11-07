@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { RxEyeClosed, RxEyeOpen } from "react-icons/rx";
+import { MdEmail, MdLock, MdArrowForward } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validationSchemas/auth";
@@ -19,7 +20,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
-
   const {
     register,
     handleSubmit,
@@ -33,13 +33,14 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginData) => {
     try {
-
-      await logIn(data)
-
+      await logIn(data);
       router.replace("/dashboard");
     } catch (err: any) {
-      console.log(err?.response.data.message)
-      setError("root", { type: "server", message: err?.response.data.message || "Login failed" });
+      console.log(err?.response.data.message);
+      setError("root", {
+        type: "server",
+        message: err?.response.data.message || "Login failed",
+      });
     }
   };
 
@@ -48,51 +49,77 @@ export default function LoginPage() {
   return (
     <AuthCard
       title="Welcome back"
-      subtitle="Log in to your account"
+      subtitle="Log in to your account to continue"
+      icon={<MdLock className="text-3xl text-white" />}
       footer={
         <p>
           New here?{" "}
-          <a href="/signup" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+          <a
+            href="/signup"
+            className="font-semibold text-zinc-900 hover:underline underline-offset-4"
+          >
             Create an account
           </a>
         </p>
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {rootError ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-            {rootError}
-          </p>
-        ) : null}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {rootError && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-red-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-red-600 text-xs font-bold">!</span>
+            </div>
+            <p>{rootError}</p>
+          </div>
+        )}
 
         <Input
           type="email"
-          label="Email"
+          label="Email address"
           placeholder="you@example.com"
+          icon={<MdEmail className="text-xl" />}
           error={errors.email?.message}
           {...register("email")}
         />
 
-        <div className="relative">
-          <Input
-            type={showPassword ? "text" : "password"}
-            label="Password"
-            placeholder="Choose a strong password"
-            error={errors.password?.message}
-            className="pr-10"
-            {...register("password")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((p) => !p)}
-            className="absolute top-11 right-4 -translate-y-1/2 cursor-pointer text-zinc-500 hover:text-zinc-700"
-            aria-label={showPassword ? "Hide password" : "Show password"}
+        <Input
+          type={showPassword ? "text" : "password"}
+          label="Password"
+          placeholder="Enter your password"
+          icon={<MdLock className="text-xl" />}
+          error={errors.password?.message}
+          rightElement={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-zinc-400 hover:text-zinc-600 transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <RxEyeClosed className="text-xl" />
+              ) : (
+                <RxEyeOpen className="text-xl" />
+              )}
+            </button>
+          }
+          {...register("password")}
+        />
+
+        <div className="flex justify-end">
+          <a
+            href="/forgot-password"
+            className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
           >
-            {showPassword ? <RxEyeClosed className="h-5 w-5" /> : <RxEyeOpen className="h-5 w-5" />}
-          </button>
+            Forgot password?
+          </a>
         </div>
 
-        <SubmitButton loading={isSubmitting}>Sign in</SubmitButton>
+        <SubmitButton
+          loading={isSubmitting}
+          icon={<MdArrowForward className="text-xl" />}
+        >
+          Sign in
+        </SubmitButton>
       </form>
     </AuthCard>
   );

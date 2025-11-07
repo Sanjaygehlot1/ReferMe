@@ -91,12 +91,16 @@ export default function Home() {
             transition={{ duration: 0.45, delay: 0.2 }}
             className="mt-8 flex flex-col gap-3 sm:flex-row"
           >
+            <Link href={'/signup'}>
             <button className="rounded-xl bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800">
               Get started • Free
             </button>
+            </Link>
+            <Link href={'/login'}>
             <button className="rounded-xl border border-zinc-200 bg-white px-6 py-3 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50">
               I already have an account
             </button>
+            </Link>
           </motion.div>
         </div>
       </section>
