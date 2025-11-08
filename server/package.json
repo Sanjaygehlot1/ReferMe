@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
-   "build": "npm exec -- esbuild src/index.ts --bundle --platform=node --target=node20 --outdir=dist --format=cjs --out-extension:.js=.cjs",
+   "build": "npm exec -- esbuild src/index.ts --bundle --platform=node --target=node20 --outdir=dist --format=cjs --out-extension:.js=.cjs --external:[*]",
     "start": "node dist/index.cjs"
   },
   "dependencies": {
