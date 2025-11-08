@@ -9,14 +9,21 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
     "noEmit": true,
     "allowImportingTsExtensions": true,
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
+
+      "target": "ES2020",
+    "module": "ESNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+ 
 
     // Other Outputs
     "sourceMap": true,
@@ -44,5 +51,11 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "include": ["src", "types"]
+  "ts-node": {
+    "esm": true, // Explicitly tell ts-node to use ESM loader
+    "compilerOptions": {
+        "module": "NodeNext"
+    }
+  },
+  "include": ["src/**/*", "types"]
 }

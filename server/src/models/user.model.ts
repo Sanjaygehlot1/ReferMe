@@ -1,7 +1,6 @@
-import mongoose, { Schema, Document } from "mongoose";
-import bcrypt from 'bcrypt'
+import mongoose, { Schema } from "mongoose";
+import bcrypt from 'bcryptjs'
 import jwt, { type SignOptions } from 'jsonwebtoken'
-import { lowercase } from "zod";
 
 const userSchema = new Schema({
     name: {

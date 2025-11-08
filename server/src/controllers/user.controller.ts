@@ -2,9 +2,7 @@ import type { Request, Response, NextFunction, CookieOptions } from "express"
 import { userModel } from "../models/user.model.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
 import { ApiError } from "../utils/ApiError.ts";
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import { envConfig } from "../../config/env.ts";
+import bcrypt from 'bcryptjs'
 import { referModel } from "../models/refer.model.ts";
 import { generateReferralCode } from "../utils/referCodeGenerator.ts";
 import { GenerateRefreshAndAccessToken } from "../utils/generateTokens.ts";
@@ -128,8 +126,10 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const cookieOptions: CookieOptions = {
             httpOnly: true,
             sameSite: "lax",
-            secure: false,
+            secure: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/'
+            
         }
 
 

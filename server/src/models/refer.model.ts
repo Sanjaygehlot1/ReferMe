@@ -2,12 +2,12 @@ import mongoose, { Schema } from "mongoose";
 
 const referSchema = new Schema({
     referal_sender: {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref : "User",
         req: true
     },
     referal_receiver: {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref : "User",
         req: true
     },
