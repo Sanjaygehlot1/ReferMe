@@ -8,9 +8,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
-   "build": "npm exec -- esbuild src/index.ts --bundle --platform=node --target=node20 --outdir=dist --format=cjs --out-extension:.js=.cjs --external:[*]",
+    "build": "npm exec -- esbuild src/index.ts --bundle --platform=node --target=node20 --outdir=dist --format=cjs --out-extension:.js=.cjs --external:express --external:dotenv --external:cors --external:cookie-parser --external:mongoose --external:bcryptjs --external:jsonwebtoken --external:qrcode --external:zod",
     "start": "node dist/index.cjs"
-  },
+},
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
