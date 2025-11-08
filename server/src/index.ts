@@ -13,12 +13,14 @@ dotenv.config({
     path : './.env'
 })
 
+app.set('trust proxy', 1);
+
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
-    credentials : true,
-    origin : process.env.FRONTEND_BASE_URL
+    origin : process.env.FRONTEND_BASE_URL,
+    credentials : true
 }))
 app.use(cookieParser())
 connectDB()
