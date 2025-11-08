@@ -23,6 +23,14 @@ app.use(cors({
 app.use(cookieParser())
 connectDB()
 
+app.get('/', (req,res,next)=>{
+    res.send({
+        message : "HealthCheckup : Server is live",
+        statusCode : 200,
+        success: true
+    })
+})
+
 app.use('/api/v1/users', userRouter);
 
 
