@@ -8,9 +8,12 @@ const AUTH_PAGES = ["/login", "/signup"];
 export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get(COOKIE_NAME)?.value;
+  console.log(url, token)
+
 
   const isProtected = PROTECTED.some((p) => url.pathname.startsWith(p));
   const isAuthPage = AUTH_PAGES.includes(url.pathname);
+  console.log(isAuthPage,isProtected)
 
   if (isProtected && !token) {
     url.pathname = "/login";
