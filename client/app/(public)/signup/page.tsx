@@ -50,7 +50,6 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: userData) => {
     try {
-      console.log(data);
       await signUp(data);
       router.replace("/login");
     } catch (err: any) {

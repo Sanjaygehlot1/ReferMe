@@ -50,13 +50,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const getUserSession = async () => {
         try {
             const response = await axiosInstance.get('/users/profile')
-            console.log(response.data)
 
             if(response.data.data){
                 setuser(response.data.data[0]);
 
             }
-            console.log(user)
 
         } catch (error) {
 

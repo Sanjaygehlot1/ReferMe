@@ -22,7 +22,6 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
         }
 
         const existingUser = await userModel.findOne({ email })
-        console.log(existingUser)
 
         if (existingUser) {
             res.status(409).json(new ApiResponse(409, "user with this email already exists", {}))
@@ -43,7 +42,6 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
             throw new ApiError(401, "Error registering user!")
         }
 
-        console.log(referCode, email, name)
 
 
         if (referCode) {
@@ -61,7 +59,6 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
 
             const existing = await referModel.findOne({ referal_receiver: user._id })
 
-            console.log("Existing", existing)
 
             if (existing) {
                 await userModel.deleteOne({ _id: user._id })
@@ -73,7 +70,6 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
                 referal_receiver: user._id
             })
 
-            console.log("Refer", refer)
 
             if (!refer) {
                 throw new ApiError(401, "Error refering user!")
@@ -90,7 +86,6 @@ export const signUpUser = async (req: Request, res: Response, next: NextFunction
                 },
                 { new: true }
             )
-            console.log(newUser)
         }
         res
             .status(201)
@@ -121,7 +116,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         if (!existingUser) {
             throw new ApiError(401, "No user exist with this email")
         }
-        console.log(existingUser)
 
         const isPassValid = bcrypt.compareSync(password, existingUser.password!)
 
@@ -229,7 +223,6 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
             throw new ApiError(401, "No user exists")
         }
 
-        console.log(existingUser)
 
         res.status(200).json(new ApiResponse(200, "user profile fetched", existingUser))
 

@@ -36,7 +36,6 @@ export default function LoginPage() {
       await logIn(data);
       router.replace("/dashboard");
     } catch (err: any) {
-      console.log(err?.response.data.message);
       setError("root", {
         type: "server",
         message: err?.response.data.message || "Login failed",
