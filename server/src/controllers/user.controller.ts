@@ -125,7 +125,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
         const cookieOptions: CookieOptions = {
             httpOnly: true,
-            sameSite: "lax",
+            sameSite: "none",
             secure: true,
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/'
